@@ -4,198 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nawng Hkio Cannabis Store</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white font-sans">
+<body class="bg-slate-900 text-white min-h-screen">
 
-    <header class="bg-green-800 p-4 shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 onclick="toggleAdmin()" class="text-xl font-bold tracking-wide text-green-300 cursor-pointer selection:bg-transparent">🌿 Nawng Hkio Cannabis Store</h1>
-            <div class="flex gap-2">
-                <button onclick="openAdminModal()" class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-full text-xs font-semibold">⚙️ Admin</button>
-                <button onclick="toggleCart()" class="bg-green-600 px-4 py-2 rounded-full font-semibold text-sm">
-                    🛒 Cart (<span id="cart-count">0</span>)
-                </button>
-            </div>
+    <nav class="bg-green-900 p-4 flex justify-between items-center shadow-lg">
+        <h1 class="text-xl font-bold text-green-300">🌿 နောင်ချိုဆေးခြောက်ဆိုင်</h1>
+        <div class="flex gap-2">
+            <button onclick="document.getElementById('admin-modal').classList.remove('hidden')" class="bg-slate-700 px-3 py-1 rounded text-sm">⚙️ Admin</button>
         </div>
-    </header>
+    </nav>
 
-    <main class="container mx-auto p-4 my-6">
-        <h2 class="text-2xl font-bold mb-6 border-b border-green-700 pb-2 text-green-400">Our Products</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="product-list"></div>
-    </main>
+    <main class="p-4 grid md:grid-cols-3 gap-4" id="products-grid"></main>
 
-    <div id="cart-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-        <div class="bg-gray-800 p-6 rounded-lg max-w-md w-full border border-green-700">
-            <h3 class="text-xl font-bold mb-4 text-green-400">Order Details</h3>
-            <div id="cart-items" class="space-y-3 mb-4 max-h-60 overflow-y-auto"></div>
-            <div class="border-t border-gray-700 pt-3 mb-4">
-                <p class="text-right font-bold">Total: <span id="cart-total">0</span> MMK</p>
-            </div>
-            <form id="order-form" onsubmit="submitOrder(event)" class="space-y-3">
-                <input type="text" id="cus-name" placeholder="သင့်အမည်" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white">
-                <input type="tel" id="cus-phone" placeholder="ဖုန်းနံပါတ်" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white">
-                <textarea id="cus-address" placeholder="ပို့ဆောင်ပေးရမည့် လိပ်စာ" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"></textarea>
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="toggleCart()" class="w-1/2 bg-gray-600 py-2 rounded font-semibold">ပိတ်မည်</button>
-                    <button type="submit" class="w-1/2 bg-green-600 py-2 rounded font-semibold">Order တင်မည်</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-        <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full border border-gray-600 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                <h3 class="text-xl font-bold text-yellow-400">⚙️ ဆိုင်ခန်း စီမံခန့်ခွဲရန်</h3>
-                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-xl">&times;</button>
-            </div>
-            
-            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-3 mb-6 bg-gray-900 p-4 rounded border border-gray-700">
-                <h4 class="text-sm font-bold text-green-400" id="form-title">ပစ္စည်းအသစ်ထည့်ရန် / ပြင်ရန်</h4>
-                <input type="hidden" id="prod-id">
-                <input type="text" id="prod-title" placeholder="ပစ္စည်းနာမည် (ဥပမာ- Pink Candy)" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
-                <input type="number" id="prod-price" placeholder="ဈေးနှုန်း (ကျပ်ငွေ)" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
-                <input type="text" id="prod-desc" placeholder="အာနိသင် / အညွှန်း (ဥပမာ- THC 28% Indica)" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
-                <input type="text" id="prod-img" placeholder="ဓါတ်ပုံလင့်ခ် (မထည့်လဲရပါတယ်)" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
-                <div class="flex gap-2">
-                    <button type="button" onclick="resetForm()" class="w-1/2 bg-gray-600 py-1.5 rounded text-sm font-semibold">Cancel</button>
-                    <button type="submit" class="w-1/2 bg-yellow-600 py-1.5 rounded text-sm font-semibold" id="btn-save">သိမ်းမည်</button>
-                </div>
-            </form>
-
-            <h4 class="text-sm font-bold mb-2 text-gray-400">လက်ရှိတင်ထားသော ပစ္စည်းများ</h4>
-            <div id="admin-product-list" class="space-y-2"></div>
+    <!-- Admin Modal -->
+    <div id="admin-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 p-4 flex items-center justify-center">
+        <div class="bg-slate-800 p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-xl mb-4 font-bold text-yellow-400">Admin ဆက်တင်</h2>
+            <input type="text" id="name" placeholder="နာမည် (ဥပမာ- Pink Candy)" class="w-full p-2 mb-2 bg-slate-700 rounded">
+            <input type="number" id="price" placeholder="ဈေးနှုန်း (MMK)" class="w-full p-2 mb-2 bg-slate-700 rounded">
+            <input type="text" id="desc" placeholder="အကြောင်းအရာ (THC 28% Indica)" class="w-full p-2 mb-4 bg-slate-700 rounded">
+            <button onclick="addProduct()" class="w-full bg-green-600 p-2 rounded font-bold">သိမ်းဆည်းမည်</button>
+            <button onclick="document.getElementById('admin-modal').classList.add('hidden')" class="w-full mt-2 bg-slate-600 p-2 rounded">ပိတ်မည်</button>
         </div>
     </div>
 
     <script>
-        // Default Local Database (If empty)
-        const defaultProducts = [
-            { id: 1, title: "Pink Candy", price: 30000, desc: "THC 28% | Indica - High Quality Strain", img: "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=400&auto=format&fit=crop&q=60" },
-            { id: 2, title: "Premium Strain B", price: 25000, desc: "Relaxing and calming effect.", img: "https://images.unsplash.com/photo-1536657464919-892534f60d6e?w=400&auto=format&fit=crop&q=60" },
-            { id: 3, title: "CBD Oil 10ml", price: 45000, desc: "Pure organic CBD extract.", img: "https://images.unsplash.com/photo-1563483783225-bf568b566cb3?w=400&auto=format&fit=crop&q=60" }
+        let products = JSON.parse(localStorage.getItem('nawng_products')) || [
+            { name: "Pink Candy", price: 30000, desc: "THC 28% Indica" }
         ];
 
-        let products = JSON.parse(localStorage.getItem('store_products')) || defaultProducts;
-        if(!localStorage.getItem('store_products')) {
-            localStorage.setItem('store_products', JSON.stringify(products));
-        }
-
-        let cart = [];
-
-        function displayProducts() {
-            // Main Store View
-            document.getElementById('product-list').innerHTML = products.map(p => `
-                <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 flex flex-col justify-between">
-                    <div>
-                        <img src="${p.img || 'https://placehold.co/300x200/22c55e/ffffff?text=Cannabis'}" alt="${p.title}" class="w-full h-48 object-cover rounded mb-4">
-                        <h3 class="text-xl font-bold text-green-300">${p.title}</h3>
-                        <p class="text-gray-400 text-sm my-2">${p.desc}</p>
-                    </div>
-                    <div class="flex justify-between items-center mt-4">
-                        <span class="text-lg font-semibold text-yellow-400">${Number(p.price).toLocaleString()} MMK</span>
-                        <button onclick="addToCart(${p.id})" class="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded text-sm font-semibold transition">Cart ထဲထည့်ရန်</button>
-                    </div>
-                </div>
-            `).join('');
-
-            // Admin List View
-            document.getElementById('admin-product-list').innerHTML = products.map(p => `
-                <div class="flex justify-between items-center bg-gray-900 p-2 rounded border border-gray-700 text-sm">
-                    <div>
-                        <p class="font-bold text-green-300">${p.title} <span class="text-yellow-400">(${Number(p.price).toLocaleString()} Ks)</span></p>
-                        <p class="text-xs text-gray-400 truncate max-w-[200px]">${p.desc}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editProduct(${p.id})" class="text-blue-400 hover:text-blue-300 font-medium">ပြင်မည်</button>
-                        <button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-300 font-medium">ဖျက်မည်</button>
-                    </div>
+        function render() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = products.map((p, i) => `
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                    <h3 class="text-xl font-bold text-green-400">${p.name}</h3>
+                    <p class="text-sm text-slate-400">${p.desc}</p>
+                    <p class="text-lg font-bold text-yellow-500 my-2">${p.price.toLocaleString()} MMK</p>
+                    <button onclick="deleteProduct(${i})" class="text-red-400 text-sm">ဖျက်မည်</button>
                 </div>
             `).join('');
         }
 
-        // Cart Actions
-        function addToCart(id) {
-            const product = products.find(p => p.id === id);
-            const item = cart.find(c => c.id === id);
-            if (item) { item.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cart-items').innerHTML = cart.map(item => `
-                <div class="flex justify-between items-center text-sm bg-gray-700 p-2 rounded">
-                    <div>
-                        <p class="font-semibold text-green-300">${item.title}</p>
-                        <p class="text-gray-400 text-xs">${Number(item.price).toLocaleString()} x ${item.quantity}</p>
-                    </div>
-                    <span class="font-bold text-yellow-400">${(item.price * item.quantity).toLocaleString()} MMK</span>
-                </div>
-            `).join('');
-            document.getElementById('cart-total').innerText = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString();
-        }
-
-        function toggleCart() { const m = document.getElementById('cart-modal'); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
-        function submitOrder(e) { e.preventDefault(); alert('အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်!'); cart = []; updateCartUI(); toggleCart(); document.getElementById('order-form').reset(); }
-
-        // Admin Actions
-        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.remove('flex'); document.getElementById('admin-modal').classList.add('hidden'); resetForm(); }
-
-        function saveProduct(e) {
-            e.preventDefault();
-            const id = document.getElementById('prod-id').value;
-            const title = document.getElementById('prod-title').value;
-            const price = document.getElementById('prod-price').value;
-            const desc = document.getElementById('prod-desc').value;
-            let img = document.getElementById('prod-img').value;
-
-            if(!img) img = "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=400&auto=format&fit=crop&q=60";
-
-            if(id) {
-                // Edit existing
-                products = products.map(p => p.id == id ? { ...p, title, price, desc, img } : p);
-            } else {
-                // Add new
-                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                products.push({ id: newId, title, price, desc, img });
-            }
-
-            localStorage.setItem('store_products', JSON.stringify(products));
-            displayProducts();
-            resetForm();
-        }
-
-        function editProduct(id) {
-            const p = products.find(prod => prod.id === id);
-            document.getElementById('prod-id').value = p.id;
-            document.getElementById('prod-title').value = p.title;
-            document.getElementById('prod-price').value = p.price;
-            document.getElementById('prod-desc').value = p.desc;
-            document.getElementById('prod-img').value = p.img;
-            document.getElementById('form-title').innerText = "⚙️ ပစ္စည်းအချက်အလက် ပြင်ဆင်ခြင်း";
-            document.getElementById('btn-save').innerText = "ပြင်ဆင်ချက်သိမ်းမည်";
-        }
-
-        function deleteProduct(id) {
-            if(confirm("ဤပစ္စည်းကို ဆိုင်ထဲမှ ဖျက်ပစ်ရန် သေချာပါသလား?")) {
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('store_products', JSON.stringify(products));
-                displayProducts();
+        function addProduct() {
+            const name = document.getElementById('name').value;
+            const price = parseInt(document.getElementById('price').value);
+            const desc = document.getElementById('desc').value;
+            if(name && price) {
+                products.push({name, price, desc});
+                localStorage.setItem('nawng_products', JSON.stringify(products));
+                render();
+                document.getElementById('admin-modal').classList.add('hidden');
             }
         }
 
-        function resetForm() {
-            document.getElementById('product-form').reset();
-            document.getElementById('prod-id').value = "";
-            document.getElementById('form-title').innerText = "ပစ္စည်းအသစ်ထည့်ရန် / ပြင်ရန်";
-            document.getElementById('btn-save').innerText = "သိမ်းမည်";
+        function deleteProduct(i) {
+            products.splice(i, 1);
+            localStorage.setItem('nawng_products', JSON.stringify(products));
+            render();
         }
 
-        // Init
-        displayProducts();
+        render();
     </script>
 </body>
 </html>
