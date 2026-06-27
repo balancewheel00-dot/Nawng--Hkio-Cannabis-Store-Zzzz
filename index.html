@@ -10,10 +10,13 @@
 
     <header class="bg-green-800 p-4 shadow-lg sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-wide text-green-300">🌿 Nawng Hkio Cannabis Store</h1>
-            <button onclick="toggleCart()" class="bg-green-600 px-4 py-2 rounded-full font-semibold">
-                🛒 Cart (<span id="cart-count">0</span>)
-            </button>
+            <h1 onclick="toggleAdmin()" class="text-xl font-bold tracking-wide text-green-300 cursor-pointer selection:bg-transparent">🌿 Nawng Hkio Cannabis Store</h1>
+            <div class="flex gap-2">
+                <button onclick="openAdminModal()" class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-full text-xs font-semibold">⚙️ Admin</button>
+                <button onclick="toggleCart()" class="bg-green-600 px-4 py-2 rounded-full font-semibold text-sm">
+                    🛒 Cart (<span id="cart-count">0</span>)
+                </button>
+            </div>
         </div>
     </header>
 
@@ -30,9 +33,9 @@
                 <p class="text-right font-bold">Total: <span id="cart-total">0</span> MMK</p>
             </div>
             <form id="order-form" onsubmit="submitOrder(event)" class="space-y-3">
-                <input type="text" id="cus-name" placeholder="သင့်အမည်" required class="w-full p-2 rounded bg-gray-700 border border-gray-600">
-                <input type="tel" id="cus-phone" placeholder="ဖုန်းနံပါတ်" required class="w-full p-2 rounded bg-gray-700 border border-gray-600">
-                <textarea id="cus-address" placeholder="ပို့ဆောင်ပေးရမည့် လိပ်စာ" required class="w-full p-2 rounded bg-gray-700 border border-gray-600"></textarea>
+                <input type="text" id="cus-name" placeholder="သင့်အမည်" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white">
+                <input type="tel" id="cus-phone" placeholder="ဖုန်းနံပါတ်" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white">
+                <textarea id="cus-address" placeholder="ပို့ဆောင်ပေးရမည့် လိပ်စာ" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"></textarea>
                 <div class="flex gap-2 pt-2">
                     <button type="button" onclick="toggleCart()" class="w-1/2 bg-gray-600 py-2 rounded font-semibold">ပိတ်မည်</button>
                     <button type="submit" class="w-1/2 bg-green-600 py-2 rounded font-semibold">Order တင်မည်</button>
@@ -41,44 +44,157 @@
         </div>
     </div>
 
+    <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 p-6 rounded-lg max-w-lg w-full border border-gray-600 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h3 class="text-xl font-bold text-yellow-400">⚙️ ဆိုင်ခန်း စီမံခန့်ခွဲရန်</h3>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-3 mb-6 bg-gray-900 p-4 rounded border border-gray-700">
+                <h4 class="text-sm font-bold text-green-400" id="form-title">ပစ္စည်းအသစ်ထည့်ရန် / ပြင်ရန်</h4>
+                <input type="hidden" id="prod-id">
+                <input type="text" id="prod-title" placeholder="ပစ္စည်းနာမည် (ဥပမာ- Pink Candy)" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
+                <input type="number" id="prod-price" placeholder="ဈေးနှုန်း (ကျပ်ငွေ)" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
+                <input type="text" id="prod-desc" placeholder="အာနိသင် / အညွှန်း (ဥပမာ- THC 28% Indica)" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
+                <input type="text" id="prod-img" placeholder="ဓါတ်ပုံလင့်ခ် (မထည့်လဲရပါတယ်)" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white text-sm">
+                <div class="flex gap-2">
+                    <button type="button" onclick="resetForm()" class="w-1/2 bg-gray-600 py-1.5 rounded text-sm font-semibold">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-yellow-600 py-1.5 rounded text-sm font-semibold" id="btn-save">သိမ်းမည်</button>
+                </div>
+            </form>
+
+            <h4 class="text-sm font-bold mb-2 text-gray-400">လက်ရှိတင်ထားသော ပစ္စည်းများ</h4>
+            <div id="admin-product-list" class="space-y-2"></div>
+        </div>
+    </div>
+
     <script>
-        const products = [
-            { id: 1, title: "Premium Strain A", price: 25000, desc: "High quality indoor grown strain.", img: "https://placehold.co/300x200/22c55e/ffffff?text=Strain+A" },
-            { id: 2, title: "Premium Strain B", price: 30000, desc: "Relaxing and calming effect.", img: "https://placehold.co/300x200/22c55e/ffffff?text=Strain+B" },
-            { id: 3, title: "CBD Oil 10ml", price: 45000, desc: "Pure organic CBD extract.", img: "https://placehold.co/300x200/22c55e/ffffff?text=CBD+Oil" }
+        // Default Local Database (If empty)
+        const defaultProducts = [
+            { id: 1, title: "Pink Candy", price: 30000, desc: "THC 28% | Indica - High Quality Strain", img: "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=400&auto=format&fit=crop&q=60" },
+            { id: 2, title: "Premium Strain B", price: 25000, desc: "Relaxing and calming effect.", img: "https://images.unsplash.com/photo-1536657464919-892534f60d6e?w=400&auto=format&fit=crop&q=60" },
+            { id: 3, title: "CBD Oil 10ml", price: 45000, desc: "Pure organic CBD extract.", img: "https://images.unsplash.com/photo-1563483783225-bf568b566cb3?w=400&auto=format&fit=crop&q=60" }
         ];
+
+        let products = JSON.parse(localStorage.getItem('store_products')) || defaultProducts;
+        if(!localStorage.getItem('store_products')) {
+            localStorage.setItem('store_products', JSON.stringify(products));
+        }
+
         let cart = [];
+
         function displayProducts() {
+            // Main Store View
             document.getElementById('product-list').innerHTML = products.map(p => `
-                <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                    <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-cover rounded mb-4">
-                    <h3 class="text-xl font-bold text-green-300">${p.title}</h3>
-                    <p class="text-gray-400 text-sm my-2">${p.desc}</p>
+                <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 flex flex-col justify-between">
+                    <div>
+                        <img src="${p.img || 'https://placehold.co/300x200/22c55e/ffffff?text=Cannabis'}" alt="${p.title}" class="w-full h-48 object-cover rounded mb-4">
+                        <h3 class="text-xl font-bold text-green-300">${p.title}</h3>
+                        <p class="text-gray-400 text-sm my-2">${p.desc}</p>
+                    </div>
                     <div class="flex justify-between items-center mt-4">
-                        <span class="text-lg font-semibold text-yellow-400">${p.price.toLocaleString()} MMK</span>
-                        <button onclick="addToCart(${p.id})" class="bg-green-600 px-3 py-1.5 rounded text-sm">Cart ထဲထည့်ရန်</button>
+                        <span class="text-lg font-semibold text-yellow-400">${Number(p.price).toLocaleString()} MMK</span>
+                        <button onclick="addToCart(${p.id})" class="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded text-sm font-semibold transition">Cart ထဲထည့်ရန်</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Admin List View
+            document.getElementById('admin-product-list').innerHTML = products.map(p => `
+                <div class="flex justify-between items-center bg-gray-900 p-2 rounded border border-gray-700 text-sm">
+                    <div>
+                        <p class="font-bold text-green-300">${p.title} <span class="text-yellow-400">(${Number(p.price).toLocaleString()} Ks)</span></p>
+                        <p class="text-xs text-gray-400 truncate max-w-[200px]">${p.desc}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editProduct(${p.id})" class="text-blue-400 hover:text-blue-300 font-medium">ပြင်မည်</button>
+                        <button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-300 font-medium">ဖျက်မည်</button>
                     </div>
                 </div>
             `).join('');
         }
+
+        // Cart Actions
         function addToCart(id) {
             const product = products.find(p => p.id === id);
             const item = cart.find(c => c.id === id);
             if (item) { item.quantity++; } else { cart.push({ ...product, quantity: 1 }); }
             updateCartUI();
         }
+
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
             document.getElementById('cart-items').innerHTML = cart.map(item => `
                 <div class="flex justify-between items-center text-sm bg-gray-700 p-2 rounded">
-                    <div><p class="font-semibold text-green-300">${item.title}</p><p class="text-gray-400">${item.price.toLocaleString()} x ${item.quantity}</p></div>
+                    <div>
+                        <p class="font-semibold text-green-300">${item.title}</p>
+                        <p class="text-gray-400 text-xs">${Number(item.price).toLocaleString()} x ${item.quantity}</p>
+                    </div>
                     <span class="font-bold text-yellow-400">${(item.price * item.quantity).toLocaleString()} MMK</span>
                 </div>
             `).join('');
             document.getElementById('cart-total').innerText = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString();
         }
+
         function toggleCart() { const m = document.getElementById('cart-modal'); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
         function submitOrder(e) { e.preventDefault(); alert('အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်!'); cart = []; updateCartUI(); toggleCart(); document.getElementById('order-form').reset(); }
+
+        // Admin Actions
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.remove('flex'); document.getElementById('admin-modal').classList.add('hidden'); resetForm(); }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('prod-id').value;
+            const title = document.getElementById('prod-title').value;
+            const price = document.getElementById('prod-price').value;
+            const desc = document.getElementById('prod-desc').value;
+            let img = document.getElementById('prod-img').value;
+
+            if(!img) img = "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=400&auto=format&fit=crop&q=60";
+
+            if(id) {
+                // Edit existing
+                products = products.map(p => p.id == id ? { ...p, title, price, desc, img } : p);
+            } else {
+                // Add new
+                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                products.push({ id: newId, title, price, desc, img });
+            }
+
+            localStorage.setItem('store_products', JSON.stringify(products));
+            displayProducts();
+            resetForm();
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            document.getElementById('prod-id').value = p.id;
+            document.getElementById('prod-title').value = p.title;
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-desc').value = p.desc;
+            document.getElementById('prod-img').value = p.img;
+            document.getElementById('form-title').innerText = "⚙️ ပစ္စည်းအချက်အလက် ပြင်ဆင်ခြင်း";
+            document.getElementById('btn-save').innerText = "ပြင်ဆင်ချက်သိမ်းမည်";
+        }
+
+        function deleteProduct(id) {
+            if(confirm("ဤပစ္စည်းကို ဆိုင်ထဲမှ ဖျက်ပစ်ရန် သေချာပါသလား?")) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('store_products', JSON.stringify(products));
+                displayProducts();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('product-form').reset();
+            document.getElementById('prod-id').value = "";
+            document.getElementById('form-title').innerText = "ပစ္စည်းအသစ်ထည့်ရန် / ပြင်ရန်";
+            document.getElementById('btn-save').innerText = "သိမ်းမည်";
+        }
+
+        // Init
         displayProducts();
     </script>
 </body>
